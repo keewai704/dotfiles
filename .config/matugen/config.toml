@@ -1,0 +1,114 @@
+[config]
+version_check = false
+fallback_color = "#8aadf4"
+prefer = "closest-to-fallback"
+caching = true
+
+[templates.matugen_css]
+input_path = "./templates/colors.css"
+output_path = "~/.config/matugen/colors.css"
+
+[templates.pywal_cache]
+input_path = "./templates/pywal-colors-waybar.css"
+output_path = "~/.cache/wal/colors-waybar.css"
+
+[templates.waybar_css]
+input_path = "./templates/pywal-colors-waybar.css"
+output_path = "~/.config/waybar/colors.css"
+
+[templates.wofi_css]
+input_path = "./templates/pywal-colors-waybar.css"
+output_path = "~/.config/wofi/colors.css"
+
+[templates.swaync_css]
+input_path = "./templates/pywal-colors-waybar.css"
+output_path = "~/.config/swaync/colors.css"
+
+[templates.swayosd_css]
+input_path = "./templates/pywal-colors-waybar.css"
+output_path = "~/.config/swayosd/colors.css"
+
+[templates.wlogout_css]
+input_path = "./templates/pywal-colors-waybar.css"
+output_path = "~/.config/wlogout/colors.css"
+post_hook = "pkill -SIGUSR2 waybar 2>/dev/null || true; swaync-client --reload-css 2>/dev/null || true"
+
+[templates.hyprland_cache]
+input_path = "./templates/pywal-colors-hyprland"
+output_path = "~/.cache/wal/colors-hyprland"
+
+[templates.hyprland]
+input_path = "./templates/pywal-colors-hyprland"
+output_path = "~/.config/hypr/colors.conf"
+post_hook = "hyprctl reload 2>/dev/null || true"
+
+[templates.shell]
+input_path = "./templates/pywal-colors.sh"
+output_path = "~/.cache/wal/colors.sh"
+
+[templates.kitty_current]
+input_path = "./templates/kitty-colors.conf"
+output_path = "~/.config/kitty/current-theme.conf"
+
+[templates.kitty_cache]
+input_path = "./templates/kitty-colors.conf"
+output_path = "~/.cache/wal/colors-kitty.conf"
+post_hook = "kitty +kitten themes --reload-in=all Matugen 2>/dev/null || true"
+
+[templates.cava]
+input_path = "./templates/cava-colors.ini"
+output_path = "~/.config/cava/config"
+post_hook = "pkill -USR2 cava 2>/dev/null || true"
+
+[templates.pywalfox]
+input_path = "./templates/pywalfox-colors.json"
+output_path = "~/.cache/wal/colors.json"
+post_hook = "pywalfox update 2>/dev/null || true"
+
+[templates.nvim_wal]
+input_path = "./templates/pywal-colors-wal.vim"
+output_path = "~/.cache/wal/colors-wal.vim"
+
+[templates.starship]
+input_path = "./templates/starship-pure.toml"
+output_path = "~/.config/starship.toml"
+
+[templates.gtk3]
+input_path = "./templates/gtk-colors.css"
+output_path = "~/.config/gtk-3.0/colors.css"
+post_hook = "~/.config/matugen/post-hook-scripts/gtk-themes-reload.sh 2>/dev/null || true"
+
+[templates.gtk4]
+input_path = "./templates/gtk-colors.css"
+output_path = "~/.config/gtk-4.0/colors.css"
+post_hook = "~/.config/matugen/post-hook-scripts/gtk-themes-reload.sh 2>/dev/null || true"
+
+[templates.kde_colors_local]
+input_path = "./templates/Matugen.colors"
+output_path = "~/.local/share/color-schemes/Matugen.colors"
+
+[templates.kde_colors_config]
+input_path = "./templates/Matugen.colors"
+output_path = "~/.config/color-schemes/Matugen.colors"
+
+[templates.kvantum_config]
+input_path = "./templates/kvantum-colors.kvconfig"
+output_path = "~/.config/Kvantum/Matugen/Matugen.kvconfig"
+
+[templates.kvantum_svg]
+input_path = "./templates/kvantum-colors.svg"
+output_path = "~/.config/Kvantum/Matugen/Matugen.svg"
+
+[templates.qt5ct_colors]
+input_path = "./templates/qtct-colors.conf"
+output_path = "~/.config/qt5ct/colors/Matugen.conf"
+
+[templates.qt6ct_colors]
+input_path = "./templates/qtct-colors.conf"
+output_path = "~/.config/qt6ct/colors/Matugen.conf"
+post_hook = "~/.config/matugen/post-hook-scripts/qt-themes-setup.sh 2>/dev/null || true"
+
+[templates.fcitx5_theme]
+input_path = "./templates/fcitx5-theme.conf"
+output_path = "~/.local/share/fcitx5/themes/Matugen/theme.conf"
+post_hook = "~/.config/matugen/post-hook-scripts/fcitx5-theme-setup.sh 2>/dev/null || true"

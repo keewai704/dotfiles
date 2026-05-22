@@ -1,0 +1,3 @@
+# Everglide SU75 Pro: allow WebHID/WebUSB keyboard configurators.
+SUBSYSTEM=="usb", ATTR{idVendor}=="1ca6", ATTR{idProduct}=="3002", MODE="0660", GROUP="users", TAG+="uaccess"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1ca6", ATTRS{idProduct}=="3002", MODE="0660", GROUP="users", TAG+="uaccess"
