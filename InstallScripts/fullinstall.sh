@@ -43,6 +43,42 @@ fi
 
 # ── Shared helpers ────────────────────────────────────────────────────────────
 
+backup_existing_path() {
+    local path="$1"
+    local timestamp
+    timestamp="$(date +%Y%m%d_%H%M%S)"
+
+    if [ -e "$path" ] || [ -L "$path" ]; then
+        local backup="${path}.backup_${timestamp}"
+        warn "Moving existing $path -> $backup"
+        mv "$path" "$backup"
+    fi
+}
+
+link_path() {
+    local src="$1"
+    local dest="$2"
+    local label="$3"
+
+    mkdir -p "$(dirname "$dest")"
+
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+        local src_real dest_real
+        src_real="$(readlink -f "$src")"
+        dest_real="$(readlink -f "$dest" 2>/dev/null || true)"
+
+        if [ "$src_real" = "$dest_real" ]; then
+            success "Linked $label"
+            return
+        fi
+
+        backup_existing_path "$dest"
+    fi
+
+    ln -s "$src" "$dest"
+    success "Linked $label"
+}
+
 backup_config() {
     local timestamp
     timestamp="$(date +%Y%m%d_%H%M%S)"
@@ -92,26 +128,18 @@ backup_bashrc() {
 }
 
 apply_dotfiles() {
-    section "Applying Dotfiles"
-    info "Copying wallpapers..."
-    cp -a "$DOTFILES_DIR/wallpapers" "$HOME/"
+    section "Linking Dotfiles"
 
-    info "Copying .icons..."
-    cp -a "$DOTFILES_DIR/.icons" "$HOME/"
-
-    info "Copying .config files..."
-    cp -a "$DOTFILES_DIR/.config/." "$HOME/.config/"
-
-    info "Copying .bashrc..."
-    cp -a "$DOTFILES_DIR/.bashrc" "$HOME/"
+    link_path "$DOTFILES_DIR/wallpapers" "$HOME/wallpapers" "wallpapers -> ~/wallpapers"
+    link_path "$DOTFILES_DIR/.icons" "$HOME/.icons" ".icons -> ~/.icons"
+    link_path "$DOTFILES_DIR/.config" "$HOME/.config" ".config -> ~/.config"
+    link_path "$DOTFILES_DIR/.bashrc" "$HOME/.bashrc" ".bashrc -> ~/.bashrc"
 
     if [ -f "$DOTFILES_DIR/.gtkrc-2.0" ]; then
-        info "Copying .gtkrc-2.0..."
-        cp -a "$DOTFILES_DIR/.gtkrc-2.0" "$HOME/"
+        link_path "$DOTFILES_DIR/.gtkrc-2.0" "$HOME/.gtkrc-2.0" ".gtkrc-2.0 -> ~/.gtkrc-2.0"
     fi
 
-    fix_wofi_paths
-    success "Dotfiles applied."
+    success "Dotfiles linked."
 }
 
 fix_wofi_paths() {
@@ -161,12 +189,14 @@ setup_wallpaper() {
         "$HOME/.local/share/fcitx5/themes/Matugen" \
         "$HOME/.config/fcitx5/conf"
 
-    matugen image "$wallpaper" \
+    if ! matugen image "$wallpaper" \
         --config "$matugen_config" \
         --mode dark \
         --type scheme-vibrant \
         --base16-backend wal \
-        --continue-on-error
+        --continue-on-error; then
+        warn "Matugen finished with warnings or post-hook errors; continuing."
+    fi
 
     if [ -x "$HOME/.config/matugen/post-hook-scripts/qt-themes-setup.sh" ]; then
         "$HOME/.config/matugen/post-hook-scripts/qt-themes-setup.sh" || true

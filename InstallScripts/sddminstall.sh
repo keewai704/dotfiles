@@ -24,19 +24,21 @@ install_packages \
 
 section "Configuring SDDM Theme"
 
-sudo install -Dm644 \
+link_system_path \
     "$DOTFILES_DIR/sddm/etc/sddm.conf.d/10-dotfiles-theme.conf" \
+    "/etc/sddm.conf.d/10-dotfiles-theme.conf" \
     "/etc/sddm.conf.d/10-dotfiles-theme.conf"
-sudo install -Dm644 \
+link_system_path \
     "$DOTFILES_DIR/sddm/etc/sddm.conf.d/20-dotfiles-virtual-keyboard.conf" \
+    "/etc/sddm.conf.d/20-dotfiles-virtual-keyboard.conf" \
     "/etc/sddm.conf.d/20-dotfiles-virtual-keyboard.conf"
-success "Installed SDDM config snippets."
+success "Linked SDDM config snippets."
 
 if [ -d "$THEME_DIR" ]; then
-    sudo install -Dm644 "$DOTFILES_DIR/sddm/themes/dotfiles.conf" "$THEME_CONFIG"
+    link_system_path "$DOTFILES_DIR/sddm/themes/dotfiles.conf" "$THEME_CONFIG" "$THEME_CONFIG"
 
     if [ -f "$DOTFILES_DIR/wallpapers/pywallpaper.jpg" ]; then
-        sudo install -Dm644 "$DOTFILES_DIR/wallpapers/pywallpaper.jpg" "$THEME_WALLPAPER"
+        link_system_path "$DOTFILES_DIR/wallpapers/pywallpaper.jpg" "$THEME_WALLPAPER" "$THEME_WALLPAPER"
     else
         warn "Default wallpaper not found; the SDDM theme background may be blank."
     fi

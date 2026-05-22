@@ -19,8 +19,7 @@ if [ ! -f "$RULE_SRC" ]; then
     exit 1
 fi
 
-sudo install -Dm644 "$RULE_SRC" "$RULE_DEST"
-success "Installed Everglide SU75 Pro udev rule."
+link_system_path "$RULE_SRC" "$RULE_DEST" "Everglide SU75 Pro udev rule"
 
 sudo udevadm control --reload-rules
 sudo udevadm trigger --subsystem-match=usb --attr-match=idVendor=1ca6 --attr-match=idProduct=3002

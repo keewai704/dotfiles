@@ -61,19 +61,20 @@ The menu currently exposes:
 
 ## Manual Install
 
-You can also copy pieces by hand. Examples:
+You can also link pieces by hand. Back up or remove any existing targets first.
 
 ```bash
-cp -a .config/hypr ~/.config/
-cp -a .config/waybar ~/.config/
-cp -a .config/wofi ~/.config/
-cp -a .config/matugen ~/.config/
-cp -a .config/nvim ~/.config/
-cp -a wallpapers ~/
-cp -a .bashrc ~/
+mkdir -p ~/.config
+ln -s ~/dotfiles/.config/hypr ~/.config/hypr
+ln -s ~/dotfiles/.config/waybar ~/.config/waybar
+ln -s ~/dotfiles/.config/wofi ~/.config/wofi
+ln -s ~/dotfiles/.config/matugen ~/.config/matugen
+ln -s ~/dotfiles/.config/nvim ~/.config/nvim
+ln -s ~/dotfiles/wallpapers ~/wallpapers
+ln -s ~/dotfiles/.bashrc ~/.bashrc
 ```
 
-After copying Matugen config, generate the initial theme:
+After linking Matugen config, generate the initial theme:
 
 ```bash
 matugen image ~/dotfiles/wallpapers/pywallpaper.jpg \

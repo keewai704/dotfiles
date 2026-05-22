@@ -38,6 +38,70 @@ install_packages() {
     paru -S --needed "${packages[@]}"
 }
 
+backup_existing_path() {
+    local path="$1"
+    local timestamp
+    timestamp="$(date +%Y%m%d_%H%M%S)"
+
+    if [ -e "$path" ] || [ -L "$path" ]; then
+        local backup="${path}.backup_${timestamp}"
+        warn "Moving existing $path -> $backup"
+        mv "$path" "$backup"
+    fi
+}
+
+link_path() {
+    local src="$1"
+    local dest="$2"
+    local label="$3"
+
+    mkdir -p "$(dirname "$dest")"
+
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+        local src_real dest_real
+        src_real="$(readlink -f "$src")"
+        dest_real="$(readlink -f "$dest" 2>/dev/null || true)"
+
+        if [ "$src_real" = "$dest_real" ]; then
+            success "Linked $label"
+            return
+        fi
+
+        backup_existing_path "$dest"
+    fi
+
+    ln -s "$src" "$dest"
+    success "Linked $label"
+}
+
+link_system_path() {
+    local src="$1"
+    local dest="$2"
+    local label="$3"
+
+    sudo mkdir -p "$(dirname "$dest")"
+
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+        local src_real dest_real
+        src_real="$(readlink -f "$src")"
+        dest_real="$(readlink -f "$dest" 2>/dev/null || true)"
+
+        if [ "$src_real" = "$dest_real" ]; then
+            success "Linked $label"
+            return
+        fi
+
+        local timestamp backup
+        timestamp="$(date +%Y%m%d_%H%M%S)"
+        backup="${dest}.backup_${timestamp}"
+        warn "Moving existing $dest -> $backup"
+        sudo mv "$dest" "$backup"
+    fi
+
+    sudo ln -s "$src" "$dest"
+    success "Linked $label"
+}
+
 copy_config_dir() {
     local src_rel="$1"
     local dest_rel="$2"
@@ -49,9 +113,7 @@ copy_config_dir() {
         return
     fi
 
-    mkdir -p "$dest"
-    cp -a "$src/." "$dest/"
-    success "Copied $src_rel -> ~/.config/$dest_rel"
+    link_path "$src" "$dest" "$src_rel -> ~/.config/$dest_rel"
 }
 
 copy_config_file() {
@@ -65,9 +127,7 @@ copy_config_file() {
         return
     fi
 
-    mkdir -p "$(dirname "$dest")"
-    cp -a "$src" "$dest"
-    success "Copied $src_rel -> ~/.config/$dest_rel"
+    link_path "$src" "$dest" "$src_rel -> ~/.config/$dest_rel"
 }
 
 copy_home_file() {
@@ -81,9 +141,21 @@ copy_home_file() {
         return
     fi
 
-    mkdir -p "$(dirname "$dest")"
-    cp -a "$src" "$dest"
-    success "Copied $src_rel -> ~/$dest_rel"
+    link_path "$src" "$dest" "$src_rel -> ~/$dest_rel"
+}
+
+copy_home_dir() {
+    local src_rel="$1"
+    local dest_rel="$2"
+    local src="$DOTFILES_DIR/$src_rel"
+    local dest="$HOME/$dest_rel"
+
+    if [ ! -d "$src" ]; then
+        warn "Missing source directory: $src"
+        return
+    fi
+
+    link_path "$src" "$dest" "$src_rel -> ~/$dest_rel"
 }
 
 apply_default_matugen() {
@@ -119,12 +191,14 @@ apply_default_matugen() {
         "$CONFIG_DIR/fcitx5/conf"
 
     info "Applying default matugen theme."
-    matugen image "$wallpaper" \
+    if ! matugen image "$wallpaper" \
         --config "$matugen_config" \
         --mode dark \
         --type scheme-vibrant \
         --base16-backend wal \
-        --continue-on-error
+        --continue-on-error; then
+        warn "Matugen finished with warnings or post-hook errors; continuing."
+    fi
 
     if [ -x "$CONFIG_DIR/matugen/post-hook-scripts/qt-themes-setup.sh" ]; then
         "$CONFIG_DIR/matugen/post-hook-scripts/qt-themes-setup.sh" || true

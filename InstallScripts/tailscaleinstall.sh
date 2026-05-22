@@ -39,12 +39,12 @@ else
 fi
 
 section "Kernel Forwarding"
-sudo install -Dm644 "$SYSCTL_SRC" "$SYSCTL_DEST"
+link_system_path "$SYSCTL_SRC" "$SYSCTL_DEST" "$SYSCTL_DEST"
 sudo sysctl -p "$SYSCTL_DEST"
-success "Installed and applied $SYSCTL_DEST."
+success "Linked and applied $SYSCTL_DEST."
 
 section "UDP GRO Forwarding"
-sudo install -Dm755 "$DISPATCHER_SRC" "$DISPATCHER_DEST"
+link_system_path "$DISPATCHER_SRC" "$DISPATCHER_DEST" "$DISPATCHER_DEST"
 
 if systemctl list-unit-files NetworkManager-dispatcher.service >/dev/null 2>&1; then
     sudo systemctl enable --now NetworkManager-dispatcher.service >/dev/null 2>&1 || \
